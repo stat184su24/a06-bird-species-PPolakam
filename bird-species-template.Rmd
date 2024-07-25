@@ -106,4 +106,85 @@ CorrectedOrdwayBirds
 ```
 
 
+### Step 3
 
+We want to identify the top 5-6 bird species sighted at the Katherine Ordway Natural History Study Area.
+
+```{r}
+# count sightings by species in descending order
+
+DescendingBirds <- CorrectedOrdwayBirds |>
+  group_by(Species) |>
+  summarize(count = n()) |>
+  arrange(desc(count))
+
+
+# a hint in the text book recommends displaying the top 10 species to choose our threshold
+
+
+
+# define a sightings threshold; produce a table with only birds belonging to major species
+
+threshold <- 1000
+
+Majors <- DescendingBirds |>
+  filter(count >= threshold)
+
+Majors
+
+```
+
+
+### Step 4
+
+We now want to produce a month-by-month count for each of the major species, and then construct a chart to tell the story of what time of year the various species appear.
+
+```{r}
+# prepare glyph-ready data table called `ByMonth`
+
+ByMonth <- OrdwayBirds |>
+  filter(SpeciesName %in% Majors$Species) |>
+  group_by(Month, SpeciesName) |>
+  summarize(count = n())
+
+```
+
+Now use the ggplot template below to generate the desired graph. (Remark you can also use esquisser or mplot to create a line chart instead of the barchart)
+
+
+
+```{r}
+# ggplot commands
+
+ByMonth %>% 
+  ggplot(aes(x = Month, y = count, color = SpeciesName)) + 
+  geom_line()
+
+ByMonth %>% ggplot(aes(x=Month,y=count ,fill=Species)) +
+  geom_bar(stat='identity',position='stack', width=.9) 
+
+```
+
+According to the graph, we can answer the questions posed:
+
+##### 1. Which species are present year-round?  
+
+The `American Goldfinch`, `Black-capped Chickadee`, and `Slate-colored Junco` are all major species that appear to be present all year long.
+
+##### 2. Which species are migratory, that is, primarily present in one or two seasons?
+
+The `Field Sparrow` and `Tree Swallow` appear to be migratory, seeing a sthey appear somewhere around March and disappear sometime around November (basically not the winter).
+
+
+##### 3. What is the peak month for each major species? (bullet list)
+
+- The `American Goldfinch` peaks in October.
+- The `Black-capped Chickadee` appears to peak sometime around November.
+- The `Field Sparrow` peaks in May.
+- The `Slate-colored Junco`, the most surveyed species in this set, primarily peaks in October with a sizable second peak occuring around April.
+- The `Tree Swallow` appears to peak somewhere in late June/early July.
+
+
+##### 4. Which major species are seen in good numbers for at least 6 months of the year?
+
+While each of the species seem rather absent during the summer months, there are species that collectively are present for a total of at least 6 months over the course of a given year. The `Slate-colored Junco` is present in no small amounts up to May, making a reappearance as the summer months wind down in August/September. Proportionally, the `Black-capped Chickadee` follows a similar trend, with the main differences being that its numbers are a lot smaller than those of the `Slate-colored Junco` and, instead of disappearing in the summer months, it stays only mildly present. In fact, with the exception of the `Tree Swallow`, all of the species seem to maintain a proportionally sizable presence over the course of at least 6 months in a given year. The `Tree Swallow` thrives in June, but quickly returns to obscurity in the surrounding months. As such, it's difficult to claim that it's seen in "good numbers" for at least 6 months of the year.
