@@ -26,4 +26,84 @@ data("OrdwayBirds")
 OrdwayBirds
 ```
 
+```{r}
+OrdwayBirds |>
+  group_by(Sex) |>
+  summarize(count = n())
+```
+
+```{r}
+OrdwayBirds |>
+  group_by(SpeciesName) |>
+  summarize(count = n())
+```
+
+# Activity
+
+When you're finished with this activity, you will have a graph that shows what time of year various species appear at the Katherine Ordway Natural History Study Area in Inver Grove Heights, MN.
+
+### Step 0
+
+Before we begin, the book gives us some instructions to select a few key variables and clean up the date formatting.  Use the commands given in the book, but be sure to study the functions used so you know what is happening.  In this case, we select `SpeciesName`, `Month`, and `Day`. Then a `mutate()` command converts each variable to character, and then converts the resulting "character string" to a number.
+
+```{r}
+# Get the data table & clean up dates (see Data Computing eBook)
+OrdwayBirds <-
+  OrdwayBirds %>%
+  select( SpeciesName, Month, Day ) %>%
+  mutate( Month = as.numeric(as.character(Month)), 
+          Day = as.numeric(as.character(Day)))
+
+
+# Inspect resulting data
+OrdwayBirds
+
+```
+
+
+
+### Step 1
+
+
+
+
+```{r}
+# unique species in original data (including mis-spellings)
+
+SpeciesCount <- OrdwayBirds |> summarize(numOfSpecies = n_distinct(SpeciesName))
+SpeciesCount # 275 w/ mis-spellings 
+
+# unique species in the clean list
+data("OrdwaySpeciesNames")
+DistinctSpeciesCount <- OrdwaySpeciesNames |> summarize(numOfSpeciesCleaned = n_distinct(SpeciesNameCleaned))
+DistinctSpeciesCount # 109 distinct in cleaned names set
+```
+
+
+### Step 2
+  
+
+
+
+```{r}
+# inspect OrdwaySpeciesNames
+
+OrdwaySpeciesNames # contains 2 variables: SpeciesName and SpeciesNameCleaned. This table appears to match various spellings of the species names to a standardized spelling of each name (Gold Finch, Goldfinch, and Golf Finch are mapped to Goldfinch, for example).
+
+
+# inner join
+CorrectedOrdwayBirds <- OrdwayBirds |>
+  inner_join(OrdwaySpeciesNames, by = "SpeciesName", relationship = "many-to-many") |>
+  select(Species = SpeciesNameCleaned, Month, Day) |>
+  na.omit()
+
+# I made some minor changes to the code snippet from the textbook. Adding a `by` clause explicitly marks that we are joining on that variable, and stating that the relationship is to `many-to-many` stops the interpreter thing from warning us every time we run this code block (we expect many-to-many since there are multiple occurrences of the various spellings in the original table)
+
+# inspect the data after the join
+
+CorrectedOrdwayBirds
+
+```
+
+
 
